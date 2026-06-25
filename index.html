@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>瞬英ワーホリ（自動再生版）</title>
+
+<style>
+body{
+  font-family:-apple-system;
+  text-align:center;
+  padding:30px;
+}
+#ja{
+  font-size:22px;
+  font-weight:bold;
+  margin-top:40px;
+}
+#en{
+  font-size:20px;
+  color:#007aff;
+  margin-top:20px;
+  min-height:30px;
+}
+#status{
+  margin-top:20px;
+  color:gray;
+}
+button{
+  font-size:18px;
+  padding:15px 25px;
+  border-radius:12px;
+  border:none;
+  margin-top:30px;
+  background:#333;
+  color:white;
+}
+</style>
+</head>
+
+<body>
+
+<h2>瞬英ワーホリ（自動再生）</h2>
+
+<div id="ja">スタートを押してください</div>
+<div id="en"></div>
+<div id="status"></div>
+
+<button onclick="start()">スタート</button>
+
+<script>
+const data = [
+ {ja:"こんにちは", en:"Hello"},
+ {ja:"お会計お願いします", en:"Can I get the bill?"},
+ {ja:"トイレどこ？", en:"Where is the toilet?"},
+ {ja:"これください", en:"I'll take this please"},
+ {ja:"いくらですか？", en:"How much is this?"}
+];
+
+let running = false;
+
+function speak(text, lang){
+  return new Promise(resolve=>{
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang;
+    u.onend = ()=> setTimeout(resolve, 500); // 音声後ちょい余韻
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  });
+}
+
+function wait(ms){
+  return new Promise(r=>setTimeout(r,ms));
+}
+
+async function loop(){
+  while(running){
+
+    const q = data[Math.floor(Math.random()*data.length)];
+
+    // 日本語表示
+    document.getElementById("ja").innerText = q.ja;
+    document.getElementById("en").innerText = "";
+    document.getElementById("status").innerText = "日本語 → 理解時間（8秒）";
+
+    await speak(q.ja,"ja-JP");
+
+    // ★ここが重要：必ず間隔固定
+    await wait(8000);
+
+    // 英語表示
+    document.getElementById("en").innerText = q.en;
+    document.getElementById("status").innerText = "英語再生中";
+
+    await speak(q.en,"en-US");
+
+    // 次の問題まで間隔
+    await wait(1500);
+  }
+}
+
+function start(){
+  if(running) return;
+  running = true;
+  loop();
+}
+</script>
+
+</body>
+</html>
