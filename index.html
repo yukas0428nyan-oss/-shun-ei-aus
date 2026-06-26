@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>瞬間英作文アプリ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  font-family: sans-serif;
+  text-align: center;
+  padding: 20px;
+}
+#ja { font-size: 22px; margin-top: 30px; }
+#en { font-size: 20px; margin-top: 20px; color: #333; }
+button {
+  font-size: 18px;
+  margin: 10px;
+  padding: 10px 20px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>瞬間英作文アプリ</h2>
+
+<div id="ja">準備中...</div>
+<div id="en"></div>
+
+<br>
+
+<button onclick="start()">開始</button>
+
+<script>
+const questions = [
+{ja:"もし明日晴れたら、僕たちはピクニックに行きます。", en:"If it is fine tomorrow, we will go on a picnic."},
+{ja:"もし彼が明日来なかったら、僕がその仕事をするよ。", en:"If he doesn’t come tomorrow, I will do the work."},
+{ja:"英語を覚えたいなら、君はもっと勉強しなければならない。", en:"If you want to learn English, you have to study more."},
+{ja:"病気だったので、彼女は欠席した。", en:"As she was sick, she was absent."},
+{ja:"雨が降っていたので、彼は一日中家にいた。", en:"He stayed at home all day because it was raining."},
+
+{ja:"彼はとても疲れていたので泳ぎに行かなかった。", en:"As she was very tired, she decided not to go swimming."},
+{ja:"宿題を終えてからテレビを見なさい。", en:"You have to do your homework before you watch television."},
+{ja:"あなたの弟は寝る前に歯を磨きますか？", en:"Does your brother brush his teeth before he goes to bed?"},
+{ja:"夕食の後に皿を洗ってください。", en:"Please wash the dishes after you eat dinner."},
+{ja:"彼が車を洗った後に雨が降り始めた。", en:"It began to rain after he washed his car."},
+
+{ja:"彼が走っている少年たちを見た。", en:"I saw the boys running."},
+{ja:"彼女は英語を話している少女です。", en:"She is the girl speaking English."},
+{ja:"その本を読んでいる学生は私の友達です。", en:"The student reading the book is my friend."},
+{ja:"これは彼が作った机です。", en:"This is a desk made by him."},
+{ja:"私は彼にドアを開けさせた。", en:"I made him open the door."},
+
+{ja:"私は彼にコーヒーを入れてもらった。", en:"I had him make coffee."},
+{ja:"彼は私にそこへ行くように言った。", en:"He told me to go there."},
+{ja:"先生は私たちに宿題を出した。", en:"The teacher told us to do homework."},
+{ja:"私はあなたに幸せになってほしい。", en:"I want you to be happy."},
+{ja:"彼女は私に部屋を掃除させた。", en:"She made me clean the room."},
+
+{ja:"彼が描いた絵は美しい。", en:"The picture which he painted is beautiful."},
+{ja:"昨日私たちが会った男性は医者です。", en:"The man we met yesterday is a doctor."},
+{ja:"彼が住んでいる家は大きい。", en:"The house where he lives is big."},
+{ja:"私が買った本は面白い。", en:"The book I bought is interesting."},
+{ja:"彼が作った歌は有名だ。", en:"The song he made is famous."},
+
+{ja:"彼女はとても疲れていて立てなかった。", en:"She was too tired to stand up."},
+{ja:"この本は難しすぎて読めない。", en:"This book is too difficult to read."},
+{ja:"彼はとても親切なので人気がある。", en:"He is so kind that he is popular."},
+{ja:"彼女はとても忙しくて手伝えなかった。", en:"She was so busy that she could not help."},
+{ja:"この部屋は十分に広い。", en:"This room is big enough."}
+];
+
+let order = [];
+let i = 0;
+
+function shuffle(){
+  order = [...Array(questions.length).keys()]
+    .sort(() => Math.random() - 0.5);
+}
+
+function speak(text, lang, rate=1){
+  speechSynthesis.cancel();
+  const uttr = new SpeechSynthesisUtterance(text);
+  uttr.lang = lang;
+  uttr.rate = rate;
+  speechSynthesis.speak(uttr);
+}
+
+function next(){
+  if(i >= order.length){
+    shuffle();
+    i = 0;
+  }
+
+  const q = questions[order[i]];
+  document.getElementById("ja").innerText = q.ja;
+  document.getElementById("en").innerText = "";
+
+  // 日本語
+  speak(q.ja, "ja-JP");
+
+  setTimeout(() => {
+    document.getElementById("en").innerText = q.en;
+    speak(q.en, "en-US");
+
+    setTimeout(() => {
+      i++;
+      next();
+    }, 2000);
+
+  }, 5000);
+}
+
+function start(){
+  shuffle();
+  i = 0;
+  next();
+}
+</script>
+
+</body>
+</html>
