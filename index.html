@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>瞬間英作文</title>
+
+<style>
+body {
+  font-family: sans-serif;
+  text-align: center;
+  padding: 20px;
+}
+#ja { font-size: 22px; margin-top: 30px; }
+#en { font-size: 20px; margin-top: 20px; color: #333; }
+button { font-size: 18px; padding: 10px 20px; }
+</style>
+</head>
+
+<body>
+
+<h2>瞬間英作文</h2>
+
+<div id="ja">待機中</div>
+<div id="en"></div>
+
+<button onclick="start()">開始</button>
+
+<script>
+
+/* ======================
+   問題（仮：土台確認用）
+====================== */
+
+const questions = [
+{ja:"もし明日晴れたら、僕たちはピクニックに行きます。", en:"If it is fine tomorrow, we will go on a picnic."},
+{ja:"彼は学校に行きます。", en:"He goes to school."},
+{ja:"私は英語を勉強します。", en:"I study English."}
+];
+
+let order = [];
+let i = 0;
+
+/* シャッフル */
+function shuffle(){
+  order = [...Array(questions.length).keys()]
+    .sort(() => Math.random() - 0.5);
+}
+
+/* 安全な音声再生（重要） */
+function speak(text, lang, rate = 1){
+
+  return new Promise((resolve) => {
+
+    const u = new SpeechSynthesisUtterance(text);
+
+    u.lang = lang;
+    u.rate = rate;
+
+    u.onend = () => {
+      resolve();
+    };
+
+    // ★ iOS対策：少し遅らせてから再生（冒頭カット防止）
+    setTimeout(() => {
+      speechSynthesis.speak(u);
+    }, 80);
+
+  });
+
+}
+
+/* メインループ */
+async function run(){
+
+  if(i >= order.length){
+    shuffle();
+    i = 0;
+  }
+
+  const q = questions[order[i]];
+
+  document.getElementById("ja").innerText = q.ja;
+  document.getElementById("en").innerText = "";
+
+  // ★重要：前の音声を確実に止めるのは「ここだけ」
+  speechSynthesis.cancel();
+
+  // 日本語
+  await speak(q.ja, "ja-JP");
+
+  // ポーズ（固定）
+  await new Promise(r => setTimeout(r, 5000));
+
+  // 英語表示
+  document.getElementById("en").innerText = q.en;
+
+  // 英語
+  await speak(q.en, "en-US");
+
+  // 次へ
+  await new Promise(r => setTimeout(r, 2000));
+
+  i++;
+  run();
+}
+
+function start(){
+  shuffle();
+  i = 0;
+  run();
+}
+
+</script>
+
+</body>
+</html>
