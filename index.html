@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>瞬間英作文</title>
+
+<style>
+body {
+  font-family: sans-serif;
+  text-align: center;
+  padding: 20px;
+}
+#ja { font-size: 22px; margin-top: 30px; }
+#en { font-size: 20px; margin-top: 20px; color: #333; }
+button { font-size: 18px; padding: 10px 20px; }
+</style>
+</head>
+
+<body>
+
+<h2>瞬間英作文</h2>
+
+<div id="ja">待機中</div>
+<div id="en"></div>
+
+<button onclick="start()">開始</button>
+
+<script>
+
+/* =====================
+   問題（テスト用10問）
+===================== */
+const questions = [
+{ja:"もし明日晴れたら、僕たちはピクニックに行きます。", en:"If it is fine tomorrow, we will go on a picnic."},
+{ja:"もし彼が明日来なかったら、僕がその仕事をするよ。", en:"If he doesn’t come tomorrow, I will do the work."},
+{ja:"雨が降っていたので、彼は一日中家にいた。", en:"He stayed at home all day because it was raining."},
+{ja:"僕が宿題をしている間、弟は漫画を読んでいた。", en:"While I was doing my homework, my brother was reading a comic book."},
+{ja:"彼が帰ってくるまでここで待とう。", en:"Let’s wait here until he comes back."},
+
+{ja:"僕は彼が何歳なのか知らない。", en:"I don’t know how old he is."},
+{ja:"彼女が今どこにいるのか教えてください。", en:"Will you please tell me where she is now?"},
+{ja:"先生は生徒に宿題をさせた。", en:"The teacher made the students do their homework."},
+{ja:"私はあなたに幸せになってほしい。", en:"I want you to be happy."},
+{ja:"昨日会った男性は医者だ。", en:"The man we met yesterday is a doctor."},
+
+{ja:"僕は何と言ったらいいのかわからなかった。",en:"I didn't know what to say."},
+{ja:"彼は英語の勉強の仕方を知りたがっている。",en:"He wants to know how to study English."},
+{ja:"英語を学ぶことは大切です。",en:"It is important to learn English."},
+{ja:"人の名前を覚えるのは、私には難しいです。",en:"It is difficult for me to remember people's names."},
+{ja:"僕は君にそこに行って欲しい。",en:"I want you to go there."},
+{ja:"先生は生徒たちに宿題をやるように言った。",en:"The teacher told the students to do their homework."},
+{ja:"私たちはその猫をミケと呼びます。",en:"We call the cat Mike."},
+{ja:"あなたのプレゼントは彼女を喜ばせるでしょう。",en:"Your present will make her happy."},
+{ja:"眠っている赤ちゃんはかわいい。",en:"The sleeping baby is cute."},
+{ja:"英語で書かれた本を読んだことがありますか？",en:"Have you ever read a book written in English?"},
+{ja:"彼には切手を集めるのが好きな友達がいます。",en:"He has a friend who likes collecting stamps."},
+
+{ja:"英語を覚えたいなら、君はもっと規則的に勉強しなければならない。",en:"If you want to learn English, you have to study more regularly."},
+{ja:"とても疲れていたので、彼女は泳ぎに行かないことにした。",en:"As she was very tired, she decided not to go swimming."},
+{ja:"あなたはテレビを見る前に宿題をしなければなりません。",en:"You have to do your homework before you watch television."},
+{ja:"あなたの弟は寝る前にいつも歯を磨きますか？",en:"Does your brother always brush his teeth before he goes to bed?"},
+{ja:"夕食を食べたら皿を洗ってください。",en:"Please wash the dishes after you eat dinner."},
+{ja:"彼が車を洗った後に雨が降り始めた。",en:"It began to rain after he washed his car."},
+{ja:"道を歩いていると、彼は旧友に会った。",en:"He met an old friend while he was walking on the street."},
+{ja:"僕たちが君を探している間、君はどこにいたんだい？",en:"Where were you while we were looking for you?"},
+{ja:"彼はその国にいる間に多くのことを学んだ。",en:"He learned a lot of things while he was in the country."},
+{ja:"彼らはその試験に受かるまで懸命に勉強しなければならない。",en:"They have to study hard until they pass the examination."},
+{ja:"僕は両親が帰ってくるまで家にいなければならない。",en:"I have to stay at home until my parents come back."},
+{ja:"その石はとても重かったけれど、彼はそれを持ち上げようとした。",en:"Although the stone was very heavy, he tried to lift it."},
+{ja:"とても疲れていたけれど彼女はピアノの練習をした。",en:"Though she was very tired, she practiced the piano."},
+{ja:"とても遅かったけれど、彼女は出かけることにした。",en:"Although it was very late, she decided to go out."},
+{ja:"あの箱の中には何が入っているんだろう？",en:"I wonder what is in that box."},
+
+{ja:"彼らはその少年がどこで生まれたのか知りたがっている。",en:"They want to know where the boy was born."},
+{ja:"君が何をしたいのか言ってくれよ。",en:"Please tell me what you want to do."},
+{ja:"彼は彼女がなぜ泣き始めたのかわからなかった。",en:"He did not know why she began to cry."},
+{ja:"彼らはどんな食べ物が好きなのかしら？",en:"I wonder what food they like."},
+{ja:"その外国人がどのくらい日本にいるか知っていますか？",en:"Do you know how long the foreigner has been in Japan?"},
+{ja:"彼らはその言葉が何を意味するのか知ろうとした。",en:"They tried to understand what the word meant."},
+{ja:"彼らはどこに行ったら良いのかわかっていますか？",en:"Do they know where to go?"},
+{ja:"僕は今何をするべきかわからない。",en:"I don't know what to do now."},
+{ja:"いつ出発したらいいか教えてください。",en:"Please tell me when to start."},
+{ja:"あなたはどちらの本を買うか決めなければならない。",en:"You must decide which book to buy."},
+{ja:"彼はその機械の使い方を学んでいる。",en:"He is learning how to use the machine."},
+{ja:"あなたのお母さんはあなたに料理の仕方を教えてくれますか？",en:"Does your mother teach you how to cook?"},
+{ja:"どちらの本もおもしろそうなので、僕はどちらを買うべきかわからない。",en:"As both books look interesting, I don't know which to buy."},
+{ja:"その店で何を買ったらいいのか教えてくれるかい？",en:"Will you please tell me what to buy at the store?"},
+{ja:"車を運転するのは簡単ですか？",en:"Is it easy to drive a car?"},
+
+{ja:"写真を撮ってもらえますか？",en:"Could you take a picture for me?"},
+{ja:"おすすめはありますか？",en:"Do you have any recommendations?"},
+{ja:"カードで払えますか？",en:"Can I pay by card?"},
+{ja:"仕事を探しています。",en:"I'm looking for a job."},
+{ja:"今日から働けます。",en:"I can start today."},
+{ja:"シフトを増やしたいです。",en:"I'd like to work more shifts."},
+{ja:"もう一度言っていただけますか？",en:"Could you say that again?"},
+{ja:"もう少しゆっくり話してもらえますか？",en:"Could you speak a little more slowly?"},
+{ja:"まだ勉強中です。",en:"I'm still learning English."},
+{ja:"ちょっと考えさせてください。",en:"Let me think for a moment."},
+{ja:"何かお手伝いしましょうか？",en:"Can I help you with anything?"},
+{ja:"今取り込み中です。",en:"I'm busy right now."},
+{ja:"あと5分で終わります。",en:"I'll be finished in five minutes."},
+{ja:"今日は何時まで働きますか？",en:"What time do you finish work today?"},
+{ja:"休憩を取ってもいいですか？",en:"Can I take a break?"}
+];
+
+let order = [];
+let i = 0;
+let initialized = false;
+
+/* シャッフル（重複なし） */
+function shuffle(){
+  order = [...Array(questions.length).keys()]
+    .sort(() => Math.random() - 0.5);
+}
+
+/* =====================
+   音声（iOS安定化版）
+===================== */
+function speak(text, lang){
+
+  return new Promise((resolve) => {
+
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang;
+    u.rate = 1;
+
+    u.onend = () => resolve();
+
+    setTimeout(() => {
+
+      // ★初回ウォームアップ（最重要）
+      if (!initialized) {
+        const warm = new SpeechSynthesisUtterance(" ");
+        warm.volume = 0;
+        speechSynthesis.speak(warm);
+        initialized = true;
+      }
+
+      // ★再生前に軽くリセット（やりすぎない）
+      speechSynthesis.cancel();
+
+      // ★少し待ってから再生（冒頭欠け防止）
+      setTimeout(() => {
+        speechSynthesis.speak(u);
+      }, 120);
+
+    }, 200);
+
+  });
+
+}
+
+/* =====================
+   メインループ
+===================== */
+async function run(){
+
+  if(i >= order.length){
+    shuffle();
+    i = 0;
+  }
+
+  const q = questions[order[i]];
+
+  document.getElementById("ja").innerText = q.ja;
+  document.getElementById("en").innerText = "";
+
+  // 日本語
+  await speak(q.ja, "ja-JP");
+
+  // ポーズ（安定用）
+  await new Promise(r => setTimeout(r, 5000));
+
+  // 英語表示
+  document.getElementById("en").innerText = q.en;
+
+  // 英語
+  await speak(q.en, "en-US");
+
+  // 次へ
+  await new Promise(r => setTimeout(r, 2000));
+
+  i++;
+  run();
+}
+
+function start(){
+  initialized = false;
+  shuffle();
+  i = 0;
+  run();
+}
+
+</script>
+
+</body>
+</html>
