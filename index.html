@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>瞬間英作文</title>
+
+<style>
+body {
+  font-family: sans-serif;
+  text-align: center;
+  padding: 20px;
+}
+#ja { font-size: 22px; margin-top: 30px; }
+#en { font-size: 20px; margin-top: 20px; color: #333; }
+button { font-size: 18px; padding: 10px 20px; }
+</style>
+</head>
+
+<body>
+
+<h2>瞬間英作文</h2>
+
+<div id="ja">待機中</div>
+<div id="en"></div>
+
+<button onclick="start()">開始</button>
+
+<script>
+
+/* =====================
+   問題（テスト用10問）
+===================== */
+const questions = [
+{ja:"もし明日晴れたら、僕たちはピクニックに行きます。", en:"If it is fine tomorrow, we will go on a picnic."},
+{ja:"もし彼が明日来なかったら、僕がその仕事をするよ。", en:"If he doesn’t come tomorrow, I will do the work."},
+{ja:"雨が降っていたので、彼は一日中家にいた。", en:"He stayed at home all day because it was raining."},
+{ja:"僕が宿題をしている間、弟は漫画を読んでいた。", en:"While I was doing my homework, my brother was reading a comic book."},
+{ja:"彼が帰ってくるまでここで待とう。", en:"Let’s wait here until he comes back."},
+
+{ja:"僕は彼が何歳なのか知らない。", en:"I don’t know how old he is."},
+{ja:"彼女が今どこにいるのか教えてください。", en:"Will you please tell me where she is now?"},
+{ja:"先生は生徒に宿題をさせた。", en:"The teacher made the students do their homework."},
+{ja:"私はあなたに幸せになってほしい。", en:"I want you to be happy."},
+{ja:"昨日会った男性は医者だ。", en:"The man we met yesterday is a doctor."},
+
+{ja:"もし明日晴れたら、僕たちはピクニックに行きます。",en:"If it is fine tomorrow, we will go on a picnic."},
+{ja:"彼が帰ってくるまでここで待っていよう。",en:"Let's wait here until he comes back."},
+{ja:"僕は彼が何歳なのか知らない。",en:"I don't know how old he is."},
+{ja:"彼女が今どこにいるのか教えてくれますか？",en:"Will you please tell me where she is now?"},
+{ja:"僕は何と言ったらいいのかわからなかった。",en:"I didn't know what to say."},
+{ja:"彼は英語の勉強の仕方を知りたがっている。",en:"He wants to know how to study English."},
+{ja:"英語を学ぶことは大切です。",en:"It is important to learn English."},
+{ja:"人の名前を覚えるのは、私には難しいです。",en:"It is difficult for me to remember people's names."},
+{ja:"僕は君にそこに行って欲しい。",en:"I want you to go there."},
+{ja:"先生は生徒たちに宿題をやるように言った。",en:"The teacher told the students to do their homework."},
+{ja:"私たちはその猫をミケと呼びます。",en:"We call the cat Mike."},
+{ja:"あなたのプレゼントは彼女を喜ばせるでしょう。",en:"Your present will make her happy."},
+{ja:"眠っている赤ちゃんはかわいい。",en:"The sleeping baby is cute."},
+{ja:"英語で書かれた本を読んだことがありますか？",en:"Have you ever read a book written in English?"},
+{ja:"彼には切手を集めるのが好きな友達がいます。",en:"He has a friend who likes collecting stamps."}
+];
+
+let order = [];
+let i = 0;
+let initialized = false;
+
+/* シャッフル（重複なし） */
+function shuffle(){
+  order = [...Array(questions.length).keys()]
+    .sort(() => Math.random() - 0.5);
+}
+
+/* =====================
+   音声（iOS安定化版）
+===================== */
+function speak(text, lang){
+
+  return new Promise((resolve) => {
+
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang;
+    u.rate = 1;
+
+    u.onend = () => resolve();
+
+    setTimeout(() => {
+
+      // ★初回ウォームアップ（最重要）
+      if (!initialized) {
+        const warm = new SpeechSynthesisUtterance(" ");
+        warm.volume = 0;
+        speechSynthesis.speak(warm);
+        initialized = true;
+      }
+
+      // ★再生前に軽くリセット（やりすぎない）
+      speechSynthesis.cancel();
+
+      // ★少し待ってから再生（冒頭欠け防止）
+      setTimeout(() => {
+        speechSynthesis.speak(u);
+      }, 120);
+
+    }, 200);
+
+  });
+
+}
+
+/* =====================
+   メインループ
+===================== */
+async function run(){
+
+  if(i >= order.length){
+    shuffle();
+    i = 0;
+  }
+
+  const q = questions[order[i]];
+
+  document.getElementById("ja").innerText = q.ja;
+  document.getElementById("en").innerText = "";
+
+  // 日本語
+  await speak(q.ja, "ja-JP");
+
+  // ポーズ（安定用）
+  await new Promise(r => setTimeout(r, 5000));
+
+  // 英語表示
+  document.getElementById("en").innerText = q.en;
+
+  // 英語
+  await speak(q.en, "en-US");
+
+  // 次へ
+  await new Promise(r => setTimeout(r, 2000));
+
+  i++;
+  run();
+}
+
+function start(){
+  initialized = false;
+  shuffle();
+  i = 0;
+  run();
+}
+
+</script>
+
+</body>
+</html>
