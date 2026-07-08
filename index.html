@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>瞬間英作文</title>
+
+<style>
+body {
+  font-family: sans-serif;
+  text-align: center;
+  padding: 20px;
+}
+#ja { font-size: 22px; margin-top: 30px; }
+#en { font-size: 20px; margin-top: 20px; color: #333; }
+button { font-size: 18px; padding: 10px 20px; }
+</style>
+</head>
+
+<body>
+
+<h2>瞬間英作文</h2>
+
+<div id="ja">待機中</div>
+<div id="en"></div>
+
+<button onclick="start()">開始</button>
+
+<script>
+
+/* =====================
+   問題（テスト用10問）
+===================== */
+const questions = [
+
+{ja:"昨日私は疲れていました。",en:"I was tired yesterday."},
+{ja:"その時彼女はとても幸福でした。",en:"She was very happy then."},
+{ja:"あなたは英語を勉強していたのですか？",en:"Were you studying English?"},
+{ja:"今日の午後君は何を読んでいたの？",en:"What were you reading this afternoon?"},
+{ja:"彼はとても忙しそうだ。",en:"He looks very busy."},
+{ja:"このスープはとてもいい味がする。",en:"This soup tastes very good."},
+{ja:"お父さんは古い辞書を僕にくれた。",en:"My father gave an old dictionary to me."},
+{ja:"兄が僕に本を一冊くれた。",en:"My brother gave me a book."},
+{ja:"私は10 月に17 歳になります。",en:"I will be seventeen years old in October."},
+{ja:"僕が君の宿題を手伝ってあげるよ。",en:"I will help you with your homework."},
+{ja:"手伝ってくれるかい？―いいとも。",en:"Will you please help me?―Sure."},
+{ja:"私は今日の午後彼に駅前で会う予定です。",en:"I am going to meet him in front of the station this afternoon."},
+{ja:"あなたは宿題を今日しなければいけません。",en:"You must do your homework today."},
+{ja:"この学校では学生たちは制服を着なくてはならない。",en:"Students have to wear uniforms in this school."},
+{ja:"その国であなたは多くのことを学べるでしょう。",en:"You will be able to learn many things in the country."},
+{ja:"彼はなんと親切なのでしょう。",en:"How kind he is!"},
+{ja:"僕はいつかアメリカに行きたい。",en:"I want to go to America someday."},
+{ja:"僕は本を何冊か借りに図書館に行った。",en:"I went to the library to borrow some books."},
+{ja:"あなたに会えてうれしいです。",en:"I am happy to meet you."},
+{ja:"私には今日しなければならない（するべき）宿題があります。",en:"I have homework to do today."},
+{ja:"彼女はピアノを弾くのが好きです。",en:"She likes playing the piano."},
+{ja:"このりんごはあのりんごより大きい。",en:"This apple is bigger than that one."},
+{ja:"ロバートは家族で一番背が高い。",en:"Robert is the tallest in his family."},
+{ja:"私はこの町に10 年住んでいます。",en:"I have lived in this town for ten years."},
+{ja:"僕はちょうど昼食を食べたところです。",en:"I have just had ［eaten］lunch."}, {ja:"僕は彼に一度会ったことがあります。",en:"I have met him once."},
+{ja:"私は2 時間この本を読んでいます。",en:"I have been reading this book for two hours."},
+{ja:"私は、彼女はアメリカに住んでいると思います。",en:"I think that she lives in America."},
+{ja:"エミリーはみんなに好かれています。",en:"Emily is liked by everybody ［everyone］."},
+{ja:"あの男の人は子供たちに好かれていません。",en:"That man is not liked by children."},
+{ja:"彼に再会した時、彼女はとても幸せだった。",en:"She was very happy when she saw him again."},
+{ja:"夏が来るとたくさんの人が海に行く。",en:"When summer comes, many people go to the sea."},
+{ja:"お母さんが部屋に入ってきた時、僕は宿題をしていた。",en:"I was doing my homework when my mother came into ［entered］the room."},
+{ja:"彼女は一枚の写真を私たちに見せた。",en:"She showed a picture to us."},
+{ja:"私はそんな本は読みません。",en:"I will not ［won’t］read such a book."},
+{ja:"紅茶をもうすこし飲みますか？―はい、お願いします。",en:"Will you have some more tea?―Yes, please."},
+{ja:"あなたはどこに泊まるつもりですか？―海辺のホテルに泊まるつもりです。",en:"Where are you going to stay?―I’m going to stay at a hotel by the sea."},
+{ja:"このパンを食べてもいいですか？―はい、いいですよ。",en:"May I eat this bread?―Yes, you may."},
+{ja:"僕はもうすぐ車の運転ができるようになるでしょう。",en:"I will be able to drive soon."},
+{ja:"チェスはなんとおもしろいのでしょう。",en:"How interesting chess is!"},
+{ja:"彼女の趣味は花を育てることです。",en:"Her hobby is to grow flowers."},
+{ja:"彼には住む家がない。",en:"He doesn’t have a house to live in."},
+{ja:"外国語を勉強するのは僕にとってとても楽しい。",en:"Learning foreign languages is a lot of fun for me."},
+{ja:"この教会はあの教会と同じくらい古い。",en:"This church is as old as that church ［one］."},
+{ja:"トムは僕より背が高い。",en:"Tom is taller than me ［I］."},
+{ja:"健康はお金より大切です。",en:"Health is more important than money."},
+{ja:"健康がもっとも大切です。",en:"Health is the most important of all."},
+{ja:"弟は僕より速く泳げます。",en:"My brother can swim faster than me ［I］."},
+{ja:"家族の中では母が一番早起きです。",en:"My mother gets up （the）earliest in my family."},
+{ja:"あなたとあなたのお父さんでは、どちらが背が高いですか？",en:"Who is taller, you or your father?"},
+
+];
+
+let order = [];
+let i = 0;
+let initialized = false;
+
+/* シャッフル（重複なし） */
+function shuffle(){
+  order = [...Array(questions.length).keys()]
+    .sort(() => Math.random() - 0.5);
+}
+
+/* =====================
+   音声（iOS安定化版）
+===================== */
+function speak(text, lang){
+
+  return new Promise((resolve) => {
+
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang;
+    u.rate = 1;
+
+    u.onend = () => resolve();
+
+    setTimeout(() => {
+
+      // ★初回ウォームアップ（最重要）
+      if (!initialized) {
+        const warm = new SpeechSynthesisUtterance(" ");
+        warm.volume = 0;
+        speechSynthesis.speak(warm);
+        initialized = true;
+      }
+
+      // ★再生前に軽くリセット（やりすぎない）
+      speechSynthesis.cancel();
+
+      // ★少し待ってから再生（冒頭欠け防止）
+      setTimeout(() => {
+        speechSynthesis.speak(u);
+      }, 120);
+
+    }, 200);
+
+  });
+
+}
+
+/* =====================
+   メインループ
+===================== */
+async function run(){
+
+  if(i >= order.length){
+    shuffle();
+    i = 0;
+  }
+
+  const q = questions[order[i]];
+
+  document.getElementById("ja").innerText = q.ja;
+  document.getElementById("en").innerText = "";
+
+  // 日本語
+  await speak(q.ja, "ja-JP");
+
+  // ポーズ（安定用）
+  await new Promise(r => setTimeout(r, 5000));
+
+  // 英語表示
+  document.getElementById("en").innerText = q.en;
+
+  // 英語
+  await speak(q.en, "en-US");
+
+  // 次へ
+  await new Promise(r => setTimeout(r, 2000));
+
+  i++;
+  run();
+}
+
+function start(){
+  initialized = false;
+  shuffle();
+  i = 0;
+  run();
+}
+
+</script>
+
+</body>
+</html>
